@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}PowerPoint Preview{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="text-center">
+    <h2 class="mb-4">PowerPoint Preview y'Ikizamini</h2>
+    <p class="lead">Wifuza kureba cyangwa gukuramo PowerPoint y'ikizamini giheruka? Kanda kuri buto iri hepfo.</p>
+    <a href="{% url 'exam_ppt_preview' %}" class="btn btn-lg btn-success">
+      <i class="bi bi-file-earmark-ppt-fill"></i> download PowerPoint
+    </a>
+  </div>
+
+  
+</div>
+{% endblock %}
