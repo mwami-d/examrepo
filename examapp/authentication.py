@@ -13,8 +13,8 @@ class EmailOrPhoneBackend(ModelBackend):
         if not username:  # Prevent NoneType error
             return None
         
-        # Check if username is an email or phone number
-        lookup_field = "email" if "@" in username else "phone_number"
+        
+        lookup_field = "phone_number"
 
         # Normalize phone number if it's not an email
         if lookup_field == "phone_number":

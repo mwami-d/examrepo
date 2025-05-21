@@ -25,27 +25,26 @@ from django.db.models.functions import Cast
 class UserProfileManager(BaseUserManager):
     """Custom manager to allow login with either email or phone."""
 
-    def create_user(self, email=None, phone_number=None, password=None, **extra_fields):
-        if not email and not phone_number:
+    def create_user(self, phone_number=None, password=None, **extra_fields):
+        if not phone_number:
             raise ValueError("Either an email or phone number is required.")
 
-        email = self.normalize_email(email) if email else None
+        
         phone_number = phone_number if phone_number else None  # Ensure None, not ""
 
-        user = self.model(email=email, phone_number=phone_number, **extra_fields)
+        user = self.model(phone_number=phone_number, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email=None, phone_number=None, password=None, **extra_fields):
+    def create_superuser(self, phone_number=None, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-        return self.create_user(email, phone_number, password, **extra_fields)
+        return self.create_user(phone_number, password, **extra_fields)
 
 
 class UserProfile(AbstractUser):
-
-    
+  
     username = None  # Remove default username field
     phone_number = models.CharField(max_length=15,default=None, unique=True, null=True, blank=True)
     ppt_bg_color = models.CharField(max_length=7, unique=True)

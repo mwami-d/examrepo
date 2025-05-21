@@ -48,8 +48,8 @@ SITE_ID = 1
 
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -90,6 +90,10 @@ DATABASES = {
     }
 }
 
+AUTHENTICATION_BACKENDS = [
+    'examapp.authentication.EmailOrPhoneBackend',  # Custom email/phone backend
+    'django.contrib.auth.backends.ModelBackend',   # Default Django backend
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
