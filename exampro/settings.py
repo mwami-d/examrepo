@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-mcg)+y+nj6j932k1(acbvy2k1s&4*ha*-%1+%*1ts9c@6g$%ee
 DEBUG = False
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
-
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS").split(",")
 
 # Application definition
 
