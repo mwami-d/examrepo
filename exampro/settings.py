@@ -34,6 +34,7 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS").split(",")
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,6 +46,55 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "KDS Admin",
+    "site_header": "Ppt Exam Admin",
+    "welcome_sign": "Welcome to the admin panel",
+    "site_brand": "Ppt Exam",
+    # "site_logo": "img/logo.png",
+    # "site_logo_classes": "img-circle",
+    "site_logo_small": "img/logo.png",
+    "custom_css": "css/custom.css",  # Path to your custom CSS file
+    
+    "site_icon": "img/logo.png",    
+    "copyright": "Ppt Exam",
+    "search_model": "examapp.Exam",
+    "show_ui_builder": True,  # Show UI builder for customizing appearance
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": False,
+    "accent": "accent-primary",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "darkly",
+    "dark_mode_theme": "darkly",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}
 
 
 MIDDLEWARE = [
