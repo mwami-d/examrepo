@@ -48,10 +48,10 @@ class UserProfile(AbstractUser):
     
     username = None  # Remove default username field
     phone_number = models.CharField(max_length=15,default=None, unique=True, null=True, blank=True)
-    ppt_bg_color = models.CharField(max_length=7, default="#ffffff")
-    ppt_text_color = models.CharField(max_length=7, default="#000000")
-    ppt_highlight_color = models.CharField(max_length=7, default="#00ff00")
-    ppt_correct_choice_text = models.CharField(max_length=7, default="#000000")
+    ppt_bg_color = models.CharField(max_length=7, unique=True)
+    ppt_text_color = models.CharField(max_length=7, unique=True)
+    ppt_highlight_color = models.CharField(max_length=7, unique=True)
+    ppt_correct_choice_text = models.CharField(max_length=7, unique=True)
     date_joined = models.DateTimeField(auto_now_add=True)
 
     USERNAME_FIELD = 'phone_number'  # Default authentication field
