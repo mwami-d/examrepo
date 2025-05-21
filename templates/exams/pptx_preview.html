@@ -38,7 +38,7 @@
     <div class="col-lg-5">
       <div class="card shadow-sm h-100">
         <div class="card-header py-2 px-3 bg-primary text-white">
-          <h6 class="mb-0">🎨 Customize PPT Slide Colors</h6>
+          <h6 class="mb-0">🎨 Customize PPT Slides Colors</h6>
         </div>
         <div class="card-body py-3 px-3">
           <form method="POST" action="{% url 'exam_ppt_preview' %}">
@@ -176,7 +176,7 @@
   const bg = bgInput.value;
   const text = textInput.value;
   const highlight = highlightInput.value;
-  const correctText = correctChoiceTextInput.value || "#000000";  // fallback to black
+  const correctText = correctChoiceTextInput.value
 
   questionSlide.style.backgroundColor = bg;
   answerSlide.style.backgroundColor = bg;
