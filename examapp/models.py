@@ -47,15 +47,12 @@ class UserProfile(AbstractUser):
 
     
     username = None  # Remove default username field
-    name = models.CharField(max_length=25, unique=True)
-    email = models.EmailField(unique=True, blank=True, null=True)
     phone_number = models.CharField(max_length=15,default=None, unique=True, null=True, blank=True)
-    # gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True, blank=True)
-    profile_picture = models.ImageField(upload_to='images/', default='images/avatar.png',null=True, blank=True)
+    ppt_bg_color = models.CharField(max_length=7, default="#ffffff")
+    ppt_text_color = models.CharField(max_length=7, default="#000000")
+    ppt_highlight_color = models.CharField(max_length=7, default="#00ff00")
+    ppt_correct_choice_text = models.CharField(max_length=7, default="#000000")
     date_joined = models.DateTimeField(auto_now_add=True)
-
-    otp_code = models.CharField(max_length=6, blank=True, null=True)
-    otp_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'phone_number'  # Default authentication field
     REQUIRED_FIELDS = ['email']  # Email is optional, but preferred
@@ -75,8 +72,8 @@ class UserProfile(AbstractUser):
 
     def clean(self):
         """Ensure phone number is in the correct format before saving."""
-        if not self.email and not self.phone_number:
-            raise ValidationError("Telefone cg Imeyili hitampo kimwe wuzuze neza.")
+        if not self.phone_number:
+            raise ValidationError("Telefone irakenewe.")
 
         if self.phone_number:
             self.phone_number = self.normalize_phone_number(self.phone_number)
@@ -91,6 +88,7 @@ class UserProfile(AbstractUser):
 
         else:
             self.phone_number = None
+    
     def normalize_phone_number(self, phone_number):
         """Ensures phone numbers are always stored in the format: +2507XXXXXXXX."""
         try:
@@ -101,34 +99,7 @@ class UserProfile(AbstractUser):
 
     
 
-    def send_otp_email(self):
-        """Generates and sends an OTP via email."""
-        if not self.email:
-            return
-
-        self.otp_code = str(random.randint(100000, 999999))
-        self.save()
-        message = f"Koresha iyi code y'isuzuma👉 {self.otp_code}"
-
-
-        try:
-            send_mail(
-                        subject=f"OTP Code yawe",
-                        message=message,
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[self.email],
-                        fail_silently=False,
-                    )
-            logger.info(f"📧 Email sent to {self.email}")
-            logger.debug(f"Attempting to send OTP to {self.email}")
-        except (BadHeaderError, SMTPException) as e:
-            raise ValidationError(
-                f"Imeri '{self.email}' ntabwo yakiriye ubutumwa. Waba warayanditse nabi cyangwa ntiyabayeho?"
-                )
-
-
-    def verify_otp(self, otp):
-        return self.otp_code == otp
+    
 
     class Meta:
         verbose_name = "User"
@@ -136,7 +107,7 @@ class UserProfile(AbstractUser):
 
 
     def __str__(self):
-        return self.email if self.email else f"{self.name} - {self.phone_number}"
+        return f"{self.phone_number}"
 
 
 class SignType(models.Model):

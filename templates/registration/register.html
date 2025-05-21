@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Iyandikishe{% endblock %}
+
+{% block content %}
+
+<style>
+  .mobile-exam-times {
+  display: none;
+  }
+  .rda {
+    background: linear-gradient(to bottom,
+    #00a9e0 0%,      /* Blue */
+    #00a9e0 50%,
+    #fcd116 50%,
+    #fcd116 75%,
+    #20603d 75%,
+    #20603d 100%);
+  }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow rounded-4 p-4">
+          <h3 class="mb-2 text-center text-primary-emphasis">Iyandikishe niba uri mushya</h3>
+          <div class="text-center mb-4 small">
+            Wariyandikishije? <a href="{% url "login" %}" class="link-primary medium" data-bs-toggle="modal" data-bs-target="#loginModal"><em><i class="bi bi-box-arrow-in-right me-1"></i>Kanda hano</em></a>
+          </div>
+          {% include "flash_message.html" %}
+            {% if registration_success %}
+                <div class="alert alert-success text-center">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    Konti yawe yahanzwe neza!
+                </div>
+                
+            {% endif %}
+            
+
+            <form method="post" action="{% url 'register' %}"id="registrationForm"  novalidate>
+                {% csrf_token %}
+
+                <!-- Phone Number -->
+                <div class="mb-3 contact-method" id="phoneField">
+                    <label for="id_phone_number" class="form-label">Telefoni</label>
+                    <div class="input-group has-validation">
+                      <span class="rda px-4"></span>
+                      <input type="text" name="phone_number" id="id_phone_number"
+                             class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}"
+                             placeholder="Urugero: 78..." value="{{ form.phone_number.value|default_if_none:'' }}" maxlength="10"/>
+                      {% comment %} <span class="position-absolute validate-icon end-0 top-50 translate-middle-y ms-2"></span> {% endcomment %}
+                  </div>
+
+                    {% if form.phone_number.errors %}
+                        <div class="text-danger phone-errors">{{ form.phone_number.errors.0 }}</div>
+                    {% else %}
+                        <div class="invalid-tooltip">Shyiramo nimero ya telefoni itangira na 07.</div>
+                    {% endif %}
+                </div>
+
+
+                <!-- Password -->
+              <div class="mb-3 position-relative">
+                <label for="id_password1" class="form-label">Ijambobanga(Password)</label>
+                <div class="input-group has-validation align-items-center position-relative">
+                    <input type="password" name="password1" id="id_password1"
+                          class="form-control" required>
+                    <button class="btn btn-outline-secondary position-relative" type="button" onclick="togglePassword('id_password1', this)">
+                        <i class="fa fa-eye"></i>
+                        {% comment %} <span class="position-absolute validate-icon end-0 top-50 translate-middle-y ms-2"></span> {% endcomment %}
+                    </button>
+                </div>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="mb-3 position-relative">
+                <label for="id_password2" class="form-label">Subiramo Ijambobanga(Password)</label>
+                <div class="input-group has-validation align-items-center position-relative">
+                    <input type="password" name="password2" id="id_password2"
+                          class="form-control" required>
+                    <button class="btn btn-outline-secondary position-relative" type="button" onclick="togglePassword('id_password2', this)">
+                        <i class="fa fa-eye"></i>
+                        {% comment %} <span class="position-absolute validate-icon end-0 top-50 translate-middle-y ms-2"></span> {% endcomment %}
+                    </button>
+                </div>
+              </div>
+
+
+                <!-- Submit -->
+                <div class="d-grid mt-4">
+                  <button type="submit" class="btn btn-primary" disabled>
+                    <i class="bi bi-person-plus-fill me-1"></i> Emeza
+                </button>
+
+                </div>
+
+                
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+      function togglePassword(id, btn) {
+          const input = document.getElementById(id);
+          const icon = btn.querySelector("i");
+          if (input.type === "password") {
+              input.type = "text";
+              icon.classList.remove("fa-eye");
+              icon.classList.add("fa-eye-slash");
+          } else {
+              input.type = "password";
+              icon.classList.remove("fa-eye-slash");
+              icon.classList.add("fa-eye");
+          }
+      }
+
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('registrationForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const fields = form.querySelectorAll('input');
+
+    // Error messages
+    const errorMessages = {
+        name: 'Izina rigomba kuba rifite inyuguti nibura 4 kandi ritari imibare gusa.',
+        email: 'Shyiramo email yujuje ibisabwa. Urugero: izina@example.com',
+        phone_number: 'Telefoni igomba gutangira na 07 kandi ikaba imibare 10.',
+        password1: 'Ijambobanga rigomba kuba rifite inyuguti nibura 4.',
+        password2: "Reba ko ijambobanga risa n'iryo hejuru.",
+    };
+
+    // Show error message
+    function showFieldError(field, message) {
+        const container = field.closest('.mb-3');
+        const existingError = container.querySelector('.live-error-msg');
+
+        field.classList.add('is-invalid');
+        field.classList.remove('is-valid');
+
+      if (!existingError) {
+        const div = document.createElement('div');
+        div.className = 'text-danger small live-error-msg mb-1';
+        div.textContent = message;
+        const label = container.querySelector('label');
+        const next = label.nextElementSibling;
+        container.insertBefore(div, next);
+      } else {
+        existingError.textContent = message;
+      }
+    }
+
+    // Clear error message
+    function clearFieldError(field) {
+        const container = field.closest('.mb-3');
+        const existingError = container.querySelector('.live-error-msg');
+        field.classList.add('is-valid');
+        field.classList.remove('is-invalid');
+        if (existingError) existingError.remove();
+    }
+
+    // Validate field
+    async function validateField(field) {
+        const name = field.name;
+        const value = field.value.trim();
+        let isValid = true;
+
+        if (name === 'phone_number') {
+            const regex = /^07\d{8}$/;
+            isValid = regex.test(value);
+        } else if (name === 'password1') {
+            isValid = value.length >= 4;
+        } else if (name === 'password2') {
+            const password1 = form.querySelector('input[name="password1"]').value;
+            isValid = value === password1;
+        }
+
+        if (isValid) {
+            clearFieldError(field);
+
+            // Check for uniqueness if the field is name, email, or phone_number
+            if (['phone_number'].includes(name)) {
+                await checkExisting(field);
+            } else {
+                field.classList.add('is-valid');
+            }
+        } else {
+            showFieldError(field, errorMessages[name] || 'Andika neza ibisabwa kuri iki gice.');
+            field.classList.remove('is-valid');
+            field.classList.add('is-invalid');
+        }
+
+        return isValid;
+    }
+
+    // Check if field value is unique
+    async function checkExisting(field) {
+        const name = field.name;
+        const value = field.value.trim();
+        if (!value) return;
+
+        try {
+            const response = await fetch(`/ajax/check-unique/?field=${name}&value=${encodeURIComponent(value)}`);
+            const data = await response.json();
+
+            if (data.exists) {
+                showFieldError(field, name === 'phone_number'
+                    ? `Iyi telefone '${value}' isanzweho*`
+                    : `Izina '${value}' risanzweho*`);
+                field.classList.remove('is-valid');
+                field.classList.add('is-invalid');
+            } else {
+                clearFieldError(field);
+                field.classList.add('is-valid');
+            }
+
+        } catch (err) {
+            console.error(`Failed to check ${name}`, err);
+        }
+    }
+
+    // Check form validity
+    async function checkFormValidity() {
+      let isFormValid = true;
+      for (const field of fields) {
+        if (field.offsetParent !== null) {
+          const value = field.value.trim();
+          if (value !== '') {
+            const valid = await validateField(field);
+            if (!valid) {
+              isFormValid = false;
+            }
+          } else {
+            isFormValid = false;
+          }
+        }
+      }
+      submitBtn.disabled = !isFormValid;
+      submitBtn.innerHTML = !isFormValid ? 'Uzuza ibisabwa wemeze' : '<i class="bi bi-person-plus-fill me-1"></i> Emeza';
+    }
+
+    form.addEventListener('submit', (e) => {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Tegereza <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    });
+    // Add event listeners to fields
+    fields.forEach(field => {
+        field.addEventListener('input', async () => {
+            await validateField(field);
+            checkFormValidity();
+        });
+
+        field.addEventListener('blur', async () => {
+            await validateField(field);
+            checkFormValidity();
+        });
+    });
+
+    checkFormValidity();
+
+    // WhatsApp consent logic
+    const yesRadio = document.getElementById('consent_yes');
+    const noRadio = document.getElementById('consent_no');
+    const whatsappField = document.getElementById('whatsappNumberField');
+    const whatsappInput = document.getElementById('id_whatsapp_number');
+    const consentSubmitBtn = document.getElementById('consentSubmitBtn');
+
+    function updateConsentUI() {
+      if (yesRadio.checked) {
+        whatsappField.style.display = 'block';
+        whatsappInput.setAttribute('required', 'required');
+        consentSubmitBtn.textContent = 'Ndemeye';
+        consentSubmitBtn.classList.remove('d-none');
+        consentSubmitBtn.classList.add('btn-success');
+      } else if (noRadio.checked) {
+        whatsappField.style.display = 'none';
+        whatsappInput.removeAttribute('required');
+        consentSubmitBtn.textContent = 'Komeza';
+        consentSubmitBtn.classList.remove('d-none');
+      }
+    }
+
+    document.querySelectorAll('input[name="consent"]').forEach(radio => {
+      radio.addEventListener('change', updateConsentUI);
+    });
+
+    document.getElementById('consentForm').addEventListener('submit', function (e) {
+      if (noRadio.checked) {
+        e.preventDefault();
+        window.location.href = "{% url 'login' %}";
+      }
+    });
+
+    updateConsentUI();
+
+    whatsappInput.oninvalid = function () {
+      this.setCustomValidity('Niba wahisemo yego, andika numero ya WhatsApp');
+    };
+    whatsappInput.oninput = function () {
+      this.setCustomValidity('');
+    };
+  });
+</script>
+{% endblock %}

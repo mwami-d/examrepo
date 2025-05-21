@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block title %}PPT COLORS{% endblock %}
+
+{% block content %}
+<style>
+  .active{
+    background-color: #007bff !important;
+    color: white !important;
+  }
+  .preview-choice {
+    cursor: pointer;
+  }  
+  .btn {
+    color: #fff;
+  }
+
+  .red{
+    color: #ff0000;
+    background-color: #fff;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+    position: relative;
+    border: 2px solid #fff;
+    text-align: center;
+
+  }
+</style>
+<div class="container my-4">
+  <div class="row g-3">
+    <!-- 🎨 Left: Color Form -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm h-100">
+        <div class="card-header py-2 px-3 bg-primary text-white">
+          <h6 class="mb-0">🎨 Customize PPT Slide Colors</h6>
+        </div>
+        <div class="card-body py-3 px-3">
+          <form method="POST" action="{% url 'exam_ppt_preview' %}">
+            {% csrf_token %}
+            <div class="mb-3 d-flex gap-2 align-items-center">
+              <label class="form-label mb-1">Slides Background Color:</label>
+              <input type="color" class="form-control form-control-color" name="bg_color" id="bg_color" value="{{ bg_color|default:'#ffffff' }}">
+            </div>
+            <div class="mb-3 d-flex gap-2 align-items-center">
+              <label class="form-label mb-1 ">Text Color:</label>
+              <input type="color" class="form-control form-control-color" name="text_color" id="text_color" value="{{ text_color|default:'#000000' }}">
+            </div>
+            <h5 class="text-center text-decoration-underline mb-4" style="text-underline-offset: 2px;">Correct Answer Slide              
+            </h5>
+            <div class="mb-3 d-flex gap-1 flex-column">
+              <div class="mb-3 d-flex gap-2 align-items-center">
+                <label class="form-label mb-1 ">Highlight:</label>
+                <input type="color" class="form-control form-control-color" name="highlight_color" id="highlight_color" value="{{ highlight_color|default:'#00ff00' }}">
+              </div>
+              <div class="mb-3 d-flex gap-2 align-items-center">
+                <label class="form-label mb-1 ">Correct choice color:</label>
+                <input type="color" class="form-control form-control-color" name="correct_choice_text" id="correct_choice_text" value="{{ correct_choice_text|default:'#000000' }}">
+              </div>
+            </div>
+            <div class="form-check mt-2">
+              <input class="form-check-input" type="checkbox" name="save_defaults" id="save_defaults" checked>
+              <label class="form-check-label small" for="save_defaults">
+                Save these colors as my default
+              </label>
+            </div>
+            <div class="text-center mt-3">
+              <button class="btn btn-success btn-sm px-4">
+                <i class="bi bi-file-earmark-ppt-fill"></i> Generate PPT
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 👁️ Right: Live Preview -->
+    <div class="col-lg-7">
+      {% if question %}
+      <div class="card shadow-sm h-50">
+          
+        <div class="card-header py-2 px-3 bg-secondary text-white position-relative">
+         
+          <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 d-flex align-items-center">
+              <i class="bi bi-broadcast me-1 red"></i>
+              <small>Live Slide Preview</small>
+            </h6>
+
+            <div class="btn-group btn-group-sm border border-light text-light" role="group">
+              <button type="button" class="btn active" id="btnQuestion">Question</button>
+              <button type="button" class="btn" id="btnAnswer">Correct answer</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body py-2 px-3">
+          <!-- Question Slide -->
+          <div id="questionSlide" class="p-2 rounded" style="background-color: #ffffff;">
+            <p id="questionText" class="mb-2" style="color: #000000; font-size: 1.4rem;">
+              1. {{ question.question_text }}
+            </p>
+
+            {% if question.question_sign %}
+            <div class="mb-2">
+              <img src="{{ question.question_sign.sign_image.url }}" width="180" class="rounded border">
+            </div>
+            {% endif %}
+
+            <div class="g-2 mb-2">
+              {% for choice in question.get_choices %}
+              <div>
+                {% if choice.type == 'text' %}
+                <p class="preview-choice mb-1" data-id="{{ choice.id }}" style="color: #000000; font-size: 1.2rem;">
+                  {{ forloop.counter0|letter }}) {{ choice.content }}
+                </p>
+                {% elif choice.type == 'image' %}
+                <img src="{{ choice.content }}" width="140" class="rounded border mb-1">
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Answer Slide -->
+          <div id="answerSlide" class="p-2 d-none" style="background-color: #ffffff; ">
+            {% for choice in question.get_choices %}
+            {% if choice.is_correct %}
+            <div id="answerBox" class="p-2 m-5  text-center large fw-semibold"
+                 style="background-color: #00ff00; color: #000000;">
+              ({{ forloop.counter0|letter }})
+              {% if choice.type == 'text' %}
+              {{ choice.content }}
+              {% else %}
+              Image
+              {% endif %}
+            </div>
+            {% if choice.type == 'image' %}
+              <div class="mt-2 text-center">
+                <img src="{{ choice.content }}" width="180" class="rounded border">
+              </div>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+  const bgInput = document.getElementById('bg_color');
+  const textInput = document.getElementById('text_color');
+  const highlightInput = document.getElementById('highlight_color');
+  const correctChoiceTextInput = document.getElementById('correct_choice_text');
+
+  const questionSlide = document.getElementById('questionSlide');
+  const answerSlide = document.getElementById('answerSlide');
+  const btnQuestion = document.getElementById('btnQuestion');
+  const btnAnswer = document.getElementById('btnAnswer');
+
+  const slidePreview = document.getElementById('slidePreview');
+  const questionText = document.getElementById('questionText');
+  const answerBox = document.getElementById('answerBox');
+  const previewChoices = document.querySelectorAll('.preview-choice');
+
+ function updatePreview() {
+  const bg = bgInput.value;
+  const text = textInput.value;
+  const highlight = highlightInput.value;
+  const correctText = correctChoiceTextInput.value || "#000000";  // fallback to black
+
+  questionSlide.style.backgroundColor = bg;
+  answerSlide.style.backgroundColor = bg;
+  questionText.style.color = text;
+
+  if (answerBox) {
+    answerBox.style.backgroundColor = highlight;
+    answerBox.style.color = correctText;
+  }
+
+  previewChoices.forEach(p => {
+    p.style.color = text;
+  });
+  }
+
+  // Toggle logic
+  btnQuestion.addEventListener('click', () => {
+    questionSlide.classList.remove('d-none');
+    answerSlide.classList.add('d-none');
+    btnQuestion.classList.add('active');
+    btnAnswer.classList.remove('active');
+  });
+
+  btnAnswer.addEventListener('click', () => {
+    answerSlide.classList.remove('d-none');
+    questionSlide.classList.add('d-none');
+    btnAnswer.classList.add('active');
+    btnQuestion.classList.remove('active');
+  });
+
+  // Live preview update
+  bgInput.addEventListener('input', updatePreview);
+  textInput.addEventListener('input', updatePreview);
+  highlightInput.addEventListener('input', updatePreview);
+  correctChoiceTextInput.addEventListener('input', updatePreview);
+
+</script>
+{% endblock %}

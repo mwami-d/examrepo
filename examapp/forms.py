@@ -32,6 +32,73 @@ from django.core.exceptions import ValidationError
 import re
 
 
+class RegisterForm(forms.ModelForm):
+    password1 = forms.CharField(
+        widget=forms.PasswordInput,
+        max_length=255,
+        min_length=4,
+        required=True,
+        label="Ijambobanga",
+    )
+
+    password2 = forms.CharField(
+        widget=forms.PasswordInput,
+        max_length=255,
+        min_length=4,
+        required=True,
+        label="Subiramo Ijambobanga",
+    )
+
+    phone_number = forms.CharField(
+        max_length=15,
+        required=False,
+        label="Telefoni",
+        widget=forms.TextInput(attrs={"placeholder": "Urugero: 78..."}),
+    )
+
+    class Meta:
+        model = UserProfile
+        fields = ['phone_number']
+
+    
+    def clean_phone_number(self):
+        phone = self.cleaned_data.get("phone_number")
+        if phone:
+            phone = phone.replace(" ", "").replace("-", "")
+            if not phone.startswith("+250"):
+                phone = "+250" + phone.lstrip("0")
+            try:
+                parsed = phonenumbers.parse(phone, "RW")
+                if not phonenumbers.is_valid_number(parsed):
+                    raise ValidationError("Kurikiza nimero y'inyarwanda urg: 78... cyangwa 078...")
+            except phonenumbers.NumberParseException:
+                raise ValidationError("Telefone wayujuje nabi. Kurikiza urugero!")
+            if UserProfile.objects.filter(phone_number=phone).exists():
+                raise ValidationError(f"Iyi telefone '{phone}' isanzweho*")
+        return phone
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+
+        if not password1:
+            self.add_error('password1', "Ijambobanga rirakenewe!")
+        if not password2:
+            self.add_error('password2', "Subiramo ijambobanga rirakenewe!")
+
+        if password1 and password2 and password1 != password2:
+            raise ValidationError("Ijambo banga rigomba gusa aho warishyize hose.")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
+
 class LoginForm(forms.Form):
     username = forms.CharField(label="Email or Phone")
     password = forms.CharField(widget=forms.PasswordInput, label="Enter your password",

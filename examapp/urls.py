@@ -3,7 +3,10 @@ from .views import *
 
 
 urlpatterns = [
-    path('', pptx, name='home'),
+    path('', home, name='home'),
+    path('pptx/', pptx, name='pptx'),
+    path("ajax/check-unique/", check_unique_field, name="check_unique_field"),
+    path('register/', register_view, name='register'),
     path('login/', login_view, name='login'),
     path('logout/', user_logout, name='logout'), 
     path('exam/preview-ppt/', exam_ppt_preview, name='exam_ppt_preview'),

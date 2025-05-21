@@ -280,3 +280,11 @@ class ExamAdmin(admin.ModelAdmin):
             'all': ('admin/css/exam_creation.css',)
         }
 
+  
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('phone_number','date_joined','ppt_bg_color','ppt_text_color','ppt_highlight_color','ppt_correct_choice_text')
+    search_fields = ('phone_number',)
+    list_filter = ('date_joined',)
+
+    
